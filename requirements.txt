@@ -1,4 +1,22 @@
-fastapi
-uvicorn[standard]
-sqlalchemy
-pydantic
+# FastAPI & server
+fastapi==0.115.2
+uvicorn[standard]==0.30.6
+
+# Database
+SQLAlchemy==2.0.35
+pydantic==2.9.2
+pydantic-settings==2.6.1
+
+# OpenAI API
+openai>=1.40.0
+
+# PDF handling & OCR
+pdfplumber==0.11.4
+PyPDF2==3.0.1
+pdf2image==1.17.0
+pytesseract==0.3.13
+Pillow==10.4.0
+
+# Utils
+python-dotenv==1.0.1
+orjson==3.10.7
