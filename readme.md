@@ -40,10 +40,12 @@ source venv/bin/activate   # macOS/Linux
 venv\Scripts\activate      # Windows
 ```
 ### Install requirements
+```bash
 pip install -r requirements.txt
-
+```
 ### Run the app
+```bash
 uvicorn app.main:app --reload
-
+```
 
 

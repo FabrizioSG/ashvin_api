@@ -2,6 +2,8 @@ from fastapi import FastAPI, Depends, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
 from pathlib import Path
 from typing import List
+import os
+from dotenv import load_dotenv
 
 from . import models, schemas, crud, database
 from .services.pipeline import process_pdf
@@ -26,6 +28,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+load_dotenv()
+
 def get_db():
     db = database.SessionLocal()
     try:
@@ -37,7 +41,7 @@ def get_db():
 @app.get("/health")
 def health_check():
     try:
-        client = OpenAI(api_key="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")
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         resp = client.responses.create(
             model="gpt-4o-mini",
             input="Reply with 'pong' if you are alive."

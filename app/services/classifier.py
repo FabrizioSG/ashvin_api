@@ -1,8 +1,12 @@
 import json
 import re
 from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
-client = OpenAI(api_key="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")
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 CATEGORIES = [
     "compliance_report",
