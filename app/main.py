@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
 from pathlib import Path
+from typing import List
 
 from . import models, schemas, crud, database
 from .services.pipeline import process_pdf
@@ -12,18 +13,17 @@ models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Document Classifier API")
 
-# ✅ Allow frontend origin (React runs on http://localhost:3000 by default)
 origins = [
-    "http://localhost:3000",   # React dev server
+    "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,          # allow specific origins
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],            # allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],            # allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 def get_db():
@@ -33,7 +33,7 @@ def get_db():
     finally:
         db.close()
 
-# ✅ Health check with OpenAI call
+# Health check with OpenAI call
 @app.get("/health")
 def health_check():
     try:
@@ -51,21 +51,27 @@ def health_check():
             "status": "error",
             "detail": str(e)
         }
-# ✅ Upload + classify + analyze
-@app.post("/classify/upload", response_model=schemas.Document)
-async def classify_upload(file: UploadFile = File(...), db: Session = Depends(get_db)):
+# Upload + classify + analyze
+
+@app.post("/classify/upload", response_model=List[schemas.Document])
+async def classify_upload(files: List[UploadFile] = File(...), db: Session = Depends(get_db)):
+    results = []
     tmp_dir = Path("uploads")
     tmp_dir.mkdir(exist_ok=True)
-    file_path = tmp_dir / file.filename
 
-    with open(file_path, "wb") as f:
-        f.write(await file.read())
+    for file in files:
+        file_path = tmp_dir / file.filename
+        with open(file_path, "wb") as f:
+            f.write(await file.read())
 
-    return process_pdf(str(file_path), db=db)
+        doc = process_pdf(str(file_path), db=db)
+        results.append(doc)
 
-# ✅ List stored documents
+    return results
+
+# List stored documents
 @app.get("/documents/", response_model=list[schemas.Document])
-def list_docs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def list_docs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.list_documents(db, skip=skip, limit=limit)
 
 # ✅ Get one document

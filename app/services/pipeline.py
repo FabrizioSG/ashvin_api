@@ -50,7 +50,6 @@ def process_pdf(pdf_path: str, db: Session):
     # 3. Analyze with OpenAI
     analysis = analyze_text(text, category)
 
-
     # 4. Generate a small summary
     summary = summarize_text(text, category)
 
