@@ -43,9 +43,21 @@ venv\Scripts\activate      # Windows
 ```bash
 pip install -r requirements.txt
 ```
+### Configure environment variables
+```bash
+OPENAI_API_KEY=your_api_key_here
+```
 ### Run the app
 ```bash
 uvicorn app.main:app --reload
 ```
 
-
+### To test OpenAi connectivity
+```bash
+curl --location 'http://127.0.0.1:8000/health'
+```
+### Quick curl to run a doc scan 
+```bash
+curl --location 'http://127.0.0.1:8000/classify/upload' \
+--form 'file=@"/Users/file_path"'
+```
